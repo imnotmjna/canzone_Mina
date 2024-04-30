@@ -5,7 +5,8 @@
 package com.mycompany.canzone_mina;
 
 import com.mycompany.canzone_mina.Canzone;
-import utility.Ordinatore;
+import eccezioni.*;
+import utilita.*;
 
 /**
  *
@@ -16,6 +17,7 @@ public class Playlist
     private final int N_MAX_CANZONE=50;
     private int nCanzoniPresenti;
     private Canzone[] elencoCanzoni;
+    private Canzone[] posizioni;
    
 
     public Playlist() 
@@ -24,6 +26,13 @@ public class Playlist
         this.elencoCanzoni = new Canzone[N_MAX_CANZONE];
     }
 
+    
+     public Canzone getCanzone(int posizione)
+    {
+        if (posizione<0 || posizione>=N_MAX_CANZONE)
+            return null;
+        return(posizioni[posizione]);
+ }
     public void aggiungiCanzone(Canzone canzone) 
     {
         if (nCanzoniPresenti < N_MAX_CANZONE) 
@@ -36,23 +45,24 @@ public class Playlist
         }
     }
 
-    public void rimuoviCanzone(Canzone canzone) 
+    public void rimuoviCanzone(int posizione) throws EccezionePosizioneNonValida, EccezionePosizioneVuota
     {
-        for (int i = 0; i < nCanzoniPresenti; i++) 
+    
+    /*    if (posizione<0 || posizione>=NUM_MAX_VOLUMI)
+            return -1; //posizione non valida 
+    */
+        try
         {
-            if (elencoCanzoni[i].equals(canzone)) 
-            {
-                for (int j = i; j < nCanzoniPresenti - 1; j++) 
-                {
-                    elencoCanzoni[j] = elencoCanzoni[j + 1];
-                }
-                elencoCanzoni[nCanzoniPresenti - 1] = null;
-                nCanzoniPresenti--;
-                break;
-            }
+            if (elencoCanzoni[posizione]==null)
+               throw new EccezionePosizioneVuota();
+            elencoCanzoni[posizione]=null;
+            //return posizione; 
         }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            throw new EccezionePosizioneNonValida();
+        } 
     }
-
     public int getNumeroCanzoniPresenti() 
     {
         return nCanzoniPresenti;

@@ -24,6 +24,15 @@ public class Canzone
         this.idCanzone = idCanzone;
         this.dataUscita = dataUscita;
     }
+    
+    public Canzone (Canzone canzone)
+    {
+        this.titolo=canzone.getTitolo();
+        this.durata=canzone.getDurata();
+        this.idCanzone=canzone.getIdCanzone();
+        this.dataUscita=canzone.getDataUscita();
+    }
+    
 
     public String getTitolo() 
     {
