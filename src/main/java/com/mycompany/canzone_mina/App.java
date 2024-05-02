@@ -6,41 +6,33 @@ package com.mycompany.canzone_mina;
 
 import eccezioni.*;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utilita.*;
 
 /**
  *
- * @author Studente
+ * @author Mina
  */
 public class App 
 {
     public static void main(String[] args) {
         
-        //Canzone c1=new Canzone("Lao", 3, 1, LocalDate.EPOCH);
-        //Canzone c2=new Canzone("Ciao",4, 2,LocalDate.EPOCH);
-        //Canzone c3=new Canzone("Ao",2, 3,LocalDate.EPOCH):
-        
-        
-        //Playlist playlist=new Playlist();
-        
-        
         String[] vociMenu;
-        int numeroVoci=11;
+        int numeroVoci=7;
         vociMenu=new String[numeroVoci];
         Menu menu;
         int voceScelta;
-        Playlist p1=new Playlist(); //creo lo scaffale vuoto
+        Playlist p1=new Playlist(); //creo la playlist vuota
         int esito;
-        //Scanner tastiera=new Scanner(System.in);
         ConsoleInput tastiera=new ConsoleInput();
-        String titolo,autore;
+        String titolo,cantante;
         int durata;
-        Canzone canz;
-        int ripiano, posizione;
-        String[] elencoTitoliAutore;
-        Canzone[] canzoniiPresenti;
-        String nomeFile="volumi.csv";
-        String nomeFileBinario="scaffale.bin";
+        Canzone canz = null;
+        int posizione;
+        String[] elencoTitoliCantante;
+        int canzoniPresenti;
+        //Canzone[] canzoniPresenti
         
         vociMenu[0]="\t--> Esci";
         vociMenu[1]="\t--> Visualizza tutte le canzoni presenti";
@@ -49,10 +41,6 @@ public class App
         vociMenu[4]="\t--> Elimina canzone (ripiano, posizione)";
         vociMenu[5]="\t--> Mostra canzoni di un artista";
         vociMenu[6]="\t--> Mostra le canzoni presenti in ordine alfabetico di titolo";
-        //vociMenu[7]="\t--> Esporta i volumi su file CSV";
-        //vociMenu[8]="\t--> Importa i volumi da file CSV";
-        //vociMenu[9]="\t--> Salva dati scaffale";
-        //vociMenu[10]="\t--> Carica dati scaffale";
         
         menu=new Menu(vociMenu);
 
@@ -69,74 +57,129 @@ public class App
                 case 1://Visualizza tutti
                     System.out.println(p1.toString());
                     break;
-                case 2://aggiungivolume
+                case 2://aggiungiCanzone
                     System.out.println("Premi invio per continuare...");
-                    tastiera.readString();
-                    System.out.println("Titolo --> ");
-                    titolo=tastiera.readString();
-                    System.out.println("Autore --> ");
-                    autore=tastiera.readString();
-                    System.out.println("Numero pagine --> ");
-                    nCanzoniPresenti=tastiera.readInt();
-                    System.out.println("Ripiano (0..4) --> ");
-                    ripiano=tastiera.readInt();
-                    System.out.println("Posizione (0..14) --> ");
-                    posizione=tastiera.readInt();  
-                    esito=s1.setCanzone(new Libro(titolo,autore,nCanzoniPresenti), ripiano, posizione);
-                    if(esito==-3)
-                        System.out.println("Ripiano inesistente");
-                    else if(esito==-1)
-                        System.out.println("Posizione inesistente");
-                    else if(esito==-2)
-                        System.out.println("Posizione già occupata");
-                    else
-                        System.out.println("Volume aggiunto correttamente");
-                    break;
+                {
+                    try 
+                    {
+                        tastiera.readString();
+                        System.out.println("Titolo --> ");
+                        titolo=tastiera.readString();
+                        System.out.println("Cantante --> ");
+                        cantante=tastiera.readString();
+                        System.out.println("Durata --> ");
+                        durata=tastiera.readInt();
+
+                        canzoniPresenti=tastiera.readInt();
+                        System.out.println("Posizione (0..49) --> ");
+                        posizione=tastiera.readInt();  
+                        esito=p1.setCanzone(canz, posizione);
+                        if(esito==-1)
+                            System.out.println("Posizione inesistente");
+                        else if(esito==-2)
+                            System.out.println("Posizione già occupata");
+                        else
+                            System.out.println("Canzone aggiunta correttamente");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Errore");
+                    } 
+                    catch (NumberFormatException ex) 
+                    {
+                         System.out.println("Errore");
+                    }
+                }
                     
                     break;
+
                 case 3:
-                    System.out.println("Ripiano (0..4) --> ");
-                    ripiano=tastiera.readInt();
-                    System.out.println("Posizione (0..14) --> ");
-                    posizione=tastiera.readInt();  
-                    canz=p1.getCanzone(posizione);
-                    if (canz==null)
-                        System.out.println("Libro non trovato!");
-                    else
-                        System.out.println("Libro cercato: "+lib.toString());
+                    System.out.println("Posizione (0..49) --> ");
+                {  
+                    try 
+                    {
+                        posizione=tastiera.readInt();
+                        canz=p1.getCanzone(posizione);
+                        if (canz==null)
+                            System.out.println("Canzone non trovata!");
+                        else
+                            System.out.println("Canzone cercata: "+canz.toString());
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Impossibile leggere da file");
+                    } 
+                    catch (NumberFormatException ex) 
+                    {
+                        System.out.println("Errore! Devi inserire un numero!");
+                    }
+                }
                     break;
+
                 case 4:
-                    System.out.println("Ripiano (0..4) --> ");
-                    ripiano=tastiera.readInt();
-                    System.out.println("Posizione (0..14) --> ");
-                    posizione=tastiera.readInt();
-                    //esito=p1.rimuoviCanzone(posizione);
-                    if(esito==-3)
-                        System.out.println("Ripiano inesistente");
-                    else if(esito==-1)
+                    System.out.println("Posizione (0..49) --> ");
+                {
+                    try 
+                    {
+                        posizione=tastiera.readInt();
+                        esito=p1.rimuoviCanzone(posizione);
+                        if(esito==-1)
+                            System.out.println("Posizione inesistente");
+                        else if(esito==-2)
+                            System.out.println("Posizione già vuota. Nessuna canzone è stato rimosso.");
+                        else
+                            System.out.println("Canzone rimossa correttamente");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Impossibile leggere da file");
+                    } 
+                    catch (NumberFormatException ex) 
+                    {
+                        System.out.println("Errore! Devi inserire un numero!");
+                    } 
+                    catch (EccezionePosizioneNonValida ex) 
+                    {
                         System.out.println("Posizione inesistente");
-                    else if(esito==-2)
-                        System.out.println("Posizione già vuota. Nessun libro è stato rimosso.");
-                    else
-                        System.out.println("Volume rimosso correttamente");
+                    } 
+                    catch (EccezionePosizioneVuota ex) 
+                    {
+                        System.out.println("Posizione già vuota");
+                    }
+                }
                     break;
+
                 case 5:
                     //svuoto buffer input
                     System.out.println("Premi invio per continuare...");
-                    tastiera.readString();
-                    System.out.println("Autore --> ");
-                    autore=tastiera.readString();
-                    elencoTitoliAutore=s1.elencoTitoliAutore(autore);
-                    if(elencoTitoliAutore==null)
-                        System.out.println("Nessun libro presente");
-                    else
+                {
+                    try 
                     {
-                        for(int i=0;i<elencoTitoliAutore.length;i++)
+                        tastiera.readString();
+                        System.out.println("Canzone --> ");
+                        cantante=tastiera.readString();
+                        elencoTitoliCantante=p1.elencoTitoliCantante(cantante);
+                        if(elencoTitoliCantante==null)
+                            System.out.println("Nessun libro presente");
+                        else
                         {
-                            System.out.println(elencoTitoliAutore[i]);
+                            for(int i=0;i<elencoTitoliCantante.length;i++)
+                            {
+                                System.out.println(elencoTitoliCantante[i]);
+                            }
                         }
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Impossibile leggere da file");
+                    } 
+                    catch (NumberFormatException ex) 
+                    {
+                        System.out.println("Errore! Devi inserire un numero!");
                     }
+                }
             }  
         }while(voceScelta!=0);
        
     }
+}

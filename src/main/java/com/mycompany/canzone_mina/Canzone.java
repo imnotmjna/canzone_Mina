@@ -13,6 +13,9 @@ import java.time.*;
 public class Canzone 
 {
     private String titolo;
+    private String cantante;
+
+    
     private int durata;
     private long idCanzone;
     private LocalDate dataUscita;
@@ -73,6 +76,14 @@ public class Canzone
     {
         this.dataUscita = dataUscita;
     }
+    
+    public String getCantante() 
+    {
+        return cantante;
+    }
 
-
+    public void setCantante(String cantante) 
+    {
+        this.cantante = cantante;
+    }
 }
