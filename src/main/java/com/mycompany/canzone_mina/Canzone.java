@@ -14,8 +14,6 @@ public class Canzone
 {
     private String titolo;
     private String cantante;
-
-    
     private int durata;
     private long idCanzone;
     private LocalDate dataUscita;
@@ -38,6 +36,7 @@ public class Canzone
     
 
     public String getTitolo() 
+
     {
         return titolo;
     }
@@ -86,4 +85,11 @@ public class Canzone
     {
         this.cantante = cantante;
     }
+    
+    @Override
+    public String toString() 
+    {
+        return "Canzone{" + "titolo=" + titolo + ", cantante=" + cantante + ", durata=" + durata + ", idCanzone=" + idCanzone + ", dataUscita=" + dataUscita + '}';
+    }
+
 }

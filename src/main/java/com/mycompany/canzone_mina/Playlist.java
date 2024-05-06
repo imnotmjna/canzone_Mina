@@ -14,7 +14,7 @@ import utilita.*;
  */
 public class Playlist 
 {
-    private final static int N_MAX_CANZONE=50;
+    private final int N_MAX_CANZONE=50;
     private int nCanzoniPresenti;
     private Canzone[] canzoni;
     private Canzone[] posizioni;
@@ -22,8 +22,46 @@ public class Playlist
 
     public Playlist() 
     {
-        this.nCanzoniPresenti = 0;
-        this.canzoni = new Canzone[N_MAX_CANZONE];
+        nCanzoniPresenti = 0;
+        canzoni = new Canzone[N_MAX_CANZONE];
+    }
+    
+     public Playlist(Playlist playlist)
+    {
+        canzoni = new Canzone[N_MAX_CANZONE];
+        Canzone c;
+        for(int i=0;i<playlist.getN_MAX_CANZONI();i++)
+        {
+            c=playlist.cercaCanzone(i);
+            if(canzoni!=null)
+                canzoni[i]=c;
+        }
+    }
+     
+    public int getN_MAX_CANZONI()
+    {
+        return N_MAX_CANZONE;
+    }
+    
+     public Canzone cercaCanzone(int codiceDaCercare)
+    {
+        for(int i=0;i<N_MAX_CANZONE;i++)
+        {
+            if(canzoni[i].getIdCanzone()==codiceDaCercare)
+                return new Canzone(canzoni[i]);
+        }
+        return null;
+    }
+     
+    public int nCanzoniPresenti()
+    {
+        int contatore=0;
+        for(int i=0;i<N_MAX_CANZONE;i++)
+        {
+            if(canzoni[i]!=null)
+                contatore++;
+        }
+        return contatore;
     }
 
      public Canzone getCanzone(int posizione)
@@ -83,6 +121,7 @@ public class Playlist
     
     
     
+    
      public String[] elencoTitoliCantante(String cantante)
    {
        Canzone canz;
@@ -118,4 +157,29 @@ public class Playlist
        }   
        return elencoTitoliAutore;
    }
+     
+     
+    public Canzone[] elencoCanzoniPresenti()
+    {
+       Canzone[] elencoCanzoniPresenti=new Canzone[nCanzoniPresenti];
+       Canzone canz;
+       int c=0; //contatore
+       for (int i=0;i<N_MAX_CANZONE;i++)
+       {
+            canz=getCanzone(i);
+            elencoCanzoniPresenti[c]=canz;
+            c++;         
+       }
+       
+       return elencoCanzoniPresenti;
+    }
+    
+    public String toString() 
+   {
+        return "Playlist{" + "N_MAX_CANZONE=" + N_MAX_CANZONE + ", nCanzoniPresenti=" + nCanzoniPresenti + ", canzoni=" + canzoni + ", posizioni=" + posizioni + '}';
+    }
+    
+    
+    
+      
 }
