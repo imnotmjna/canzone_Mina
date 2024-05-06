@@ -6,7 +6,7 @@ package eccezioni;
 
 /**
  *
- * @author gian
+ * @author Mina
  */
 public class EccezionePosizioneNonValida extends Exception
 {

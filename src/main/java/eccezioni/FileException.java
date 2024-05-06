@@ -6,7 +6,7 @@ package eccezioni;
 
 /**
  *
- * @author Studente
+ * @author Mina
  */
 public class FileException extends Exception
 {

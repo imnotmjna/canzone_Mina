@@ -8,7 +8,7 @@ import java.io.*;
 
 /**
  *
- * @author Studente
+ * @author Mina
  */
 public class ConsoleInput 
 {

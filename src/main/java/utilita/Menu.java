@@ -9,7 +9,9 @@ import java.util.*;
 
 /**
  * 
- * @author Studente
+ * @author Mina
+ * 
+ * 
  * Rapprensenta un menu costituito da un elenco di voci. 
  * Il metodo elencoVoci è un array di String cdove ogni elemento
  * costituisce una delle voci.

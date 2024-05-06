@@ -10,7 +10,7 @@ import com.mycompany.canzone_mina.Canzone;
 
 /**
  *
- * @author gian
+ * @author Mina
  */
 public class Ordinatore 
 {

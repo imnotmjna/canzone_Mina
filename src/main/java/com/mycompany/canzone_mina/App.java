@@ -19,20 +19,22 @@ public class App
     {
         
         String[] vociMenu;
-        int numeroVoci=7;
+        int numeroVoci=11;
         vociMenu=new String[numeroVoci];
         Menu menu;
         int voceScelta=0;
         Playlist p1=new Playlist(); //creo la playlist vuota
-        int esito=0;
+        int esito;
         ConsoleInput tastiera=new ConsoleInput();
-        String titolo=null;
-        String cantante=null;
+        String titolo;
+        String cantante;
         int durata=0;
-        Canzone canz = null;
+        Canzone canz;
         int posizione=0;
         String[] elencoTitoliCantante=null;
         Canzone[] canzoniPresenti;
+        String nomeFile="canzoni.csv";
+        String nomeFileBinario="playlist.bin";
         
         vociMenu[0]="\t--> Esci";
         vociMenu[1]="\t--> Visualizza tutte le canzoni presenti";
@@ -41,6 +43,11 @@ public class App
         vociMenu[4]="\t--> Elimina canzone (ripiano, posizione)";
         vociMenu[5]="\t--> Mostra canzoni di un artista";
         vociMenu[6]="\t--> Mostra le canzoni presenti in ordine alfabetico di titolo";
+        vociMenu[7]="\t--> Esporta le canzoni su file CSV";
+        vociMenu[8]="\t--> Importa le canzoni da file CSV";
+        vociMenu[9]="\t--> Salva dati";
+        vociMenu[10]="\t--> Carica dati";
+        
         
         menu=new Menu(vociMenu);
 
@@ -89,15 +96,16 @@ public class App
                             catch (NumberFormatException e)
                             {
                                 System.out.println("Errore! Devi inserire un numero!");
-                            } 
-                            catch (IOException ex) 
-                            {
-                                System.out.println("Impossibile leggere da file");
                             }  
                         }while(true); 
                         
+                        System.out.println("Inserisci la data di uscita (AAAA-MM-GG): ");
+                        String inputData = tastiera.readString();
+                        LocalDate dataUscita = LocalDate.parse(inputData);
+                        
                         p1.setCanzone(new Canzone(titolo, durata, posizione, LocalDate.MIN),posizione);
                         System.out.println("Canzone aggiunto correttamente");
+                        
                     }
                     catch (NumberFormatException ex) 
                     {
@@ -105,12 +113,12 @@ public class App
                     } 
                     catch (IOException ex) 
                     {
-                        
+                        System.out.println("Impossibile leggere da tastiera!");
                     }
                     break;
 
                 case 3:
-                     try 
+                    try 
                     {
                         do
                         {
@@ -196,7 +204,66 @@ public class App
                         System.out.println(canzoniPresenti[i].toString());
                     }
                     break;
+                    
+                 case 7: //esporta su file CSV
+                    try 
+                    {
+                        p1.esportaCSV(nomeFile);
+                        System.out.println("Esportazione avvenuta con successo!");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Errore di scrittura, impossibile accedere al file");
+                    } 
+                    catch (FileException ex) 
+                    {
+                        System.out.println("Errore file aperto in lettura!");
+                    }
+                    break;
+                 case 8:              
+                    try 
+                    {
+                        p1.importaCSV(nomeFile);
+                        System.out.println("Importazione avvenuta con successo.");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Impossibile leggere dal file");
+                    } 
+                    break;
+                case 9:
+                    try
+                    {
+                       
+                        p1.salvaPlaylist(nomeFileBinario);
+                        System.out.println("Salvataggio avvenuto correttamente");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Impossibile salvare su file");
+                    }
+                    break;
+                case 10: 
+                    try 
+                    {
+                        //carica playlist
+                        p1=p1.caricaPlaylist(nomeFileBinario);
+                        System.out.println("Caricamento avvenuto con successo");
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println("Impossibile leggere da file");
+                    } 
+                    catch (ClassNotFoundException ex) 
+                    {
+                        System.out.println("Impossibile leggere i dati dello scaffale");
+                    }
+
+                    break;
             }  
         }while(voceScelta!=0);
     }
 }
+
+
+        
