@@ -47,8 +47,8 @@ public class Playlist implements Serializable
         for(int i=0;i<playlist.getN_MAX_CANZONI();i++)
         {
             c=playlist.cercaCanzone(i);
-            if(canzoni!=null)
-                canzoni[i]=c;
+            if(c!=null)
+                canzoni[i]=new Canzone(c);
         }
     }
      
@@ -102,14 +102,20 @@ public class Playlist implements Serializable
      * @return La canzone nella posizione specificata se presente; 
      *         altrimenti, null.
      */
-     public Canzone getCanzone(int posizione)
+     public Canzone getCanzone(int posizione) throws EccezionePosizioneNonValida, EccezionePosizioneVuota
     {
-        if (posizione<0 || posizione>=N_MAX_CANZONE)
-            return null;
-        if (canzoni[posizione]==null)
-            return null; //posizione vuota
-        else
+        try
+        {
             return new Canzone(canzoni[posizione]);
+        }
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+            throw new EccezionePosizioneNonValida();
+        }
+        catch(NullPointerException e)
+        {
+            throw new EccezionePosizioneVuota();         
+        }
     }
      
     /**
@@ -121,36 +127,21 @@ public class Playlist implements Serializable
      *         -1 se la posizione non è valida; 
      *          -2 se la posizione è già occupata.
      */
-   public int setCanzone(Canzone canzone, int posizione)
+   public void setCanzone(Canzone canzone, int posizione) throws EccezionePosizioneOccupata, EccezionePosizioneNonValida
     {
-        if (posizione<0 || posizione>=getNumeroCanzoniPresenti())
-        return -1; //Posizione non valida
-        if (canzoni[posizione]!=null)
-        return -2; //posizione già occupata
-        else
+        try
         {
-        canzoni[posizione]=new Canzone(canzone);
-        return posizione;
+            if (canzoni[posizione]!=null)
+                throw new EccezionePosizioneOccupata();
+            canzoni[posizione]=new Canzone(canzone);
         }
-    }
-   
-    /**
-     * Aggiunge una canzone alla playlist.
-     * 
-     * @param canzone La canzone da aggiungere alla playlist.
-     */
-    public void aggiungiCanzone(Canzone canzone) 
-    {
-        if (nCanzoniPresenti < N_MAX_CANZONE) 
+        catch(ArrayIndexOutOfBoundsException e)
         {
-            canzoni[nCanzoniPresenti] = canzone;
-            nCanzoniPresenti++;
-        } else 
-        {
-            System.out.println("La playlist è piena, impossibile aggiungere altre canzoni.");
+            throw new eccezioni.EccezionePosizioneNonValida();
         }
+        
     }
-
+ 
     /**
      * Rimuove una canzone dalla playlist in una determinata posizione.
      * 
@@ -161,21 +152,19 @@ public class Playlist implements Serializable
      * @throws EccezionePosizioneNonValida Se la posizione specificata non è valida.
      * @throws EccezionePosizioneVuota Se la posizione specificata è vuota.
      */ 
-    public int rimuoviCanzone(int posizione) throws EccezionePosizioneNonValida, EccezionePosizioneVuota
+    public void rimuoviCanzone(int posizione) throws EccezionePosizioneNonValida, EccezionePosizioneVuota
     {
-    
         try
         {
-            if (canzoni[posizione]==null)
-               throw new EccezionePosizioneVuota();
+            if (canzoni[posizione] == null)
+                throw new EccezionePosizioneVuota();
             canzoni[posizione]=null;
-            //return posizione; 
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
             throw new EccezionePosizioneNonValida();
-        } 
-        return posizione;
+        }
+       
     }
     
     /**
@@ -185,7 +174,7 @@ public class Playlist implements Serializable
      * @return Un array di stringhe contenente i titoli delle canzoni del cantantese presenti; 
      *         altrimenti, null.
      */
-     public String[] elencoTitoliCantante(String cantante)
+     public String[] elencoTitoliCantante(String cantante) throws EccezionePosizioneVuota, EccezionePosizioneNonValida
    {
        Canzone canz;
        String[] elencoTitoliAutore;
@@ -226,7 +215,7 @@ public class Playlist implements Serializable
      * 
      * @return Un array di stringhe contenente i titoli delle canzoni presenti nella playlist.
      */
-    public Canzone[] elencoCanzoniPresenti()
+    public Canzone[] elencoCanzoniPresenti() throws EccezionePosizioneNonValida, EccezionePosizioneVuota
     {
        Canzone[] elencoCanzoniPresenti=new Canzone[nCanzoniPresenti];
        Canzone canz;
@@ -241,7 +230,7 @@ public class Playlist implements Serializable
        return elencoCanzoniPresenti;
     }
     
-    public void esportaCSV(String fileName) throws IOException, FileException
+    public void esportaCSV(String fileName) throws IOException, FileException, EccezionePosizioneVuota, EccezionePosizioneNonValida
     {
         TextFile f1 = new TextFile(fileName, 'W');
         Canzone canzone;
@@ -260,7 +249,8 @@ public class Playlist implements Serializable
     {
         TextFile f1 = new TextFile(fileName, 'R');
         String rigaLetta;
-
+        Canzone canz;
+        int posizione = 0;
         try 
         {
             while (true)
@@ -277,7 +267,19 @@ public class Playlist implements Serializable
                 Canzone canzone = new Canzone(titolo, durata, idCanzone, dataUscita);
                 canzone.setCantante(cantante);
                 
-                aggiungiCanzone(canzone);
+                
+                try 
+                {
+                    setCanzone(canzone, posizione);
+                } 
+                catch (EccezionePosizioneOccupata ex) 
+                {
+                    //non fa nulla
+                } 
+                catch (EccezionePosizioneNonValida ex) 
+                {
+                    //non fa nulla
+                }
             } 
         } 
         catch (FileException ex) 
@@ -336,5 +338,11 @@ public class Playlist implements Serializable
         return s;
     }
     
+        /**
+     * Metodo che cerca dall' elenco un pasticcino dato il suo codice identificativo
+     * @param codiceDaCercare il codice del pasticcino che si vuole cercare
+     * @return il pasticcino cercato
+     */
+ 
       
 }

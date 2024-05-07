@@ -7,6 +7,9 @@ package com.mycompany.canzone_mina;
 import eccezioni.*;
 import java.io.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utilita.*;
 
 /**
@@ -28,11 +31,13 @@ public class App
         ConsoleInput tastiera=new ConsoleInput();
         String titolo;
         String cantante;
-        int durata=0;
-        Canzone canz;
-        int posizione=0;
-        String[] elencoTitoliCantante=null;
-        Canzone[] canzoniPresenti;
+        LocalDate dataUscita;
+        int durata;
+        Canzone canz = null;
+        int posizione;
+        int idCanzone = 0;
+        String[] elencoTitoliCantante = null;
+        Canzone[] canzoniPresenti = null;
         String nomeFile="canzoni.csv";
         String nomeFileBinario="playlist.bin";
         
@@ -40,7 +45,7 @@ public class App
         vociMenu[1]="\t--> Visualizza tutte le canzoni presenti";
         vociMenu[2]="\t--> Aggiungi canzone";
         vociMenu[3]="\t--> Visualizza canzone (posizione) ";
-        vociMenu[4]="\t--> Elimina canzone (ripiano, posizione)";
+        vociMenu[4]="\t--> Elimina canzone (posizione)";
         vociMenu[5]="\t--> Mostra canzoni di un artista";
         vociMenu[6]="\t--> Mostra le canzoni presenti in ordine alfabetico di titolo";
         vociMenu[7]="\t--> Esporta le canzoni su file CSV";
@@ -99,23 +104,48 @@ public class App
                             }  
                         }while(true); 
                         
-                        System.out.println("Inserisci la data di uscita (AAAA-MM-GG): ");
-                        String inputData = tastiera.readString();
-                        LocalDate dataUscita = LocalDate.parse(inputData);
-                        
-                        p1.setCanzone(new Canzone(titolo, durata, posizione, LocalDate.MIN),posizione);
-                        System.out.println("Canzone aggiunto correttamente");
-                        
+                        do {
+                                try 
+                                {
+                                    System.out.println("Inserisci la data di uscita (AAAA-MM-GG): ");
+                                    String inputData = tastiera.readString();
+                                    dataUscita = LocalDate.parse(inputData); // Utilizza la variabile corretta
+                                    break; // Esci dal ciclo se l'input è corretto
+                                } 
+                                catch (DateTimeParseException e) 
+                                { // Gestisci eccezione specifica per il parsing della data
+                                    System.out.println("Errore! Formato data non valido. Inserisci la data nel formato corretto (AAAA-MM-GG)");
+                                }
+                            } while (true);
+                        try
+                        {
+                            try 
+                            {
+                                p1.setCanzone(new Canzone(titolo, durata, idCanzone, dataUscita),posizione);
+                            } 
+                            catch (EccezionePosizioneOccupata ex) 
+                            {
+                                System.out.println("Posizione già occupata");
+                            } 
+                            catch (EccezionePosizioneNonValida ex) 
+                            {
+                                 System.out.println("Posizione non valida");
+                            }
+                            System.out.println("Canzone aggiunta correttamente");
+                        }   
+                        catch (NumberFormatException ex) 
+                        {
+                            System.out.println("Errore");
+                        } 
                     }
-                    catch (NumberFormatException ex) 
-                    {
-                        System.out.println("Errore");
-                    } 
                     catch (IOException ex) 
                     {
                         System.out.println("Impossibile leggere da tastiera!");
                     }
+            
                     break;
+
+
 
                 case 3:
                     try 
@@ -132,14 +162,27 @@ public class App
                             {
                                 System.out.println("Errore! Devi inserire un numero!");
                             }  
-                        }while(true);  
-                        canz=p1.getCanzone(posizione);
+                        }while(true); 
+                        
+                            try 
+                            {
+                                canz=p1.getCanzone(posizione);
+                            } 
+                            catch (EccezionePosizioneNonValida ex) 
+                            {
+                                 System.out.println("Posizione non valida");
+                            }
+                            catch (EccezionePosizioneVuota ex) 
+                            {
+                                System.out.println("Posizione vuota");
+                            }
                         System.out.println("Canzone carcata: "+canz.toString());
                     } 
                     catch (IOException e)
                     {
                         System.out.println("Impossibile leggere da tastiera!");
                     }
+                        
                     break;
                 case 4:
                     try 
@@ -179,17 +222,28 @@ public class App
                         System.out.println("Cantante --> ");
                         cantante=tastiera.readString();
                       
-                        elencoTitoliCantante=p1.elencoTitoliCantante(cantante);
-                        if(elencoTitoliCantante==null)
-                            System.out.println("Nessuna canzone presente");
-                        else
+                try 
+                {
+                    elencoTitoliCantante=p1.elencoTitoliCantante(cantante);
+                } 
+                catch (EccezionePosizioneNonValida ex) 
+                {
+                      System.out.println("Posizione inesistente");
+                } 
+                catch (EccezionePosizioneVuota ex) 
+                {
+                      System.out.println("Posizione già vuota. Nessuna canzone è stata rimossa.");
+                }
+                    if(elencoTitoliCantante==null)
+                        System.out.println("Nessuna canzone presente");
+                    else
+                    {
+                        for(int i=0;i<elencoTitoliCantante.length;i++)
                         {
-                            for(int i=0;i<elencoTitoliCantante.length;i++)
-                            {
-                                System.out.println(elencoTitoliCantante[i]);
-                            }
-                        }   
-                    }
+                            System.out.println(elencoTitoliCantante[i]);
+                        }
+                    }   
+                }
                     catch (IOException e)
                     {
                         System.out.println("Impossibile leggere da tastiera");
@@ -197,13 +251,27 @@ public class App
                     break;
                     
                 case 6:
-                    canzoniPresenti=p1.elencoCanzoniPresenti();
+                {
+                    try 
+                    {
+                        canzoniPresenti=p1.elencoCanzoniPresenti();
+                    } 
+                    catch (EccezionePosizioneNonValida ex) 
+                    {
+                          System.out.println("Posizione inesistente");
+                    } 
+                    catch (EccezionePosizioneVuota ex) 
+                    {
+                          System.out.println("Posizione già vuota. Nessuna canzone è stata rimossa.");
+                    }
+                }
                     canzoniPresenti=Ordinatore.selectionSortCrescenteCanzoni(canzoniPresenti);
                     for(int i=0;i<canzoniPresenti.length;i++)
                     {
                         System.out.println(canzoniPresenti[i].toString());
                     }
                     break;
+
                     
                  case 7: //esporta su file CSV
                     try 
@@ -219,7 +287,16 @@ public class App
                     {
                         System.out.println("Errore file aperto in lettura!");
                     }
+                    catch (EccezionePosizioneNonValida ex) 
+                    {
+                          System.out.println("Posizione inesistente");
+                    } 
+                    catch (EccezionePosizioneVuota ex) 
+                    {
+                          System.out.println("Posizione già vuota. Nessuna canzone è stata rimossa.");
+                    }
                     break;
+
                  case 8:              
                     try 
                     {

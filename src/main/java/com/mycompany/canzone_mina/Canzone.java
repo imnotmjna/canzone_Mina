@@ -156,7 +156,7 @@ public class Canzone implements Serializable
     public String toString() 
     {
         String s;
-        s="Canzone{" + "titolo=" + titolo + ", cantante=" + cantante + ", durata=" + durata + ", idCanzone=" + idCanzone + ", dataUscita=" + dataUscita + '}';
+        s=getTitolo()+";"+getCantante()+";"+getDurata()+";"+getDataUscita()+";";
         return s;
     }
 
